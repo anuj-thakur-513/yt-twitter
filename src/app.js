@@ -18,7 +18,6 @@ app.use(cookieParser());
 
 // routes import
 import v1 from "./routes/version1.routes.js";
-
 // routes declaration
 app.use("/v1", v1);
 
