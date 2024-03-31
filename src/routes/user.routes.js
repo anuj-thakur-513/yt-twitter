@@ -36,7 +36,7 @@ userRouter.post("/login", loginUser);
 userRouter.post("/logout", verifyJwt, logoutUser);
 userRouter.post("/refresh-token", refreshAccessToken);
 userRouter.post("/update-password", verifyJwt, changeCurrentPassword);
-userRouter.post("/get-current-user", verifyJwt, getCurrentUser);
+userRouter.get("/get-current-user", verifyJwt, getCurrentUser);
 userRouter.post("/update-account-details", verifyJwt, updateAccountDetails);
 userRouter.post(
   "/update-avatar",
