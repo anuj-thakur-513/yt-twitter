@@ -3,8 +3,12 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { AUTH_COOKIE_OPTIONS, EMAIL_REGEX } from "../constants.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteImageOnCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import { getCloudinaryPublicId } from "../utils/getCloudinaryPublicId.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -277,8 +281,11 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while uploading avatar");
   }
 
-  const user = await User.findByIdAndUpdate(
-    req?.user._id,
+  const user = await User.findById(req?.user._id);
+  const existingAvatarId = getCloudinaryPublicId(user.avatar);
+  await deleteImageOnCloudinary(existingAvatarId);
+  const updatedUser = await User.findOneAndUpdate(
+    user._id,
     {
       $set: {
         avatar: avatar.url,
@@ -289,7 +296,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "Avatar updated successfully"));
+    .json(new ApiResponse(200, updatedUser, "Avatar updated successfully"));
 });
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
@@ -304,7 +311,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while uploading coverImage");
   }
 
-  const user = await User.findByIdAndUpdate(
+  const user = await User.findById(req?.user._id);
+  const existingCoverImageId = getCloudinaryPublicId(user.coverImage);
+  await deleteImageOnCloudinary(existingCoverImageId);
+  const updatedUser = await User.findByIdAndUpdate(
     req?.user._id,
     {
       $set: {
@@ -316,7 +326,9 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "Cover Image updated successfully"));
+    .json(
+      new ApiResponse(200, updatedUser, "Cover Image updated successfully")
+    );
 });
 
 export {
