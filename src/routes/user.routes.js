@@ -3,6 +3,8 @@ import { upload } from "../middlewares/multer.middleware.js";
 import {
   changeCurrentPassword,
   getCurrentUser,
+  getUserChannelProfile,
+  getWatchHistory,
   loginUser,
   logoutUser,
   refreshAccessToken,
@@ -37,18 +39,20 @@ userRouter.post("/logout", verifyJwt, logoutUser);
 userRouter.post("/refresh-token", refreshAccessToken);
 userRouter.post("/update-password", verifyJwt, changeCurrentPassword);
 userRouter.get("/get-current-user", verifyJwt, getCurrentUser);
-userRouter.post("/update-account-details", verifyJwt, updateAccountDetails);
-userRouter.post(
+userRouter.patch("/update-account-details", verifyJwt, updateAccountDetails);
+userRouter.patch(
   "/update-avatar",
   verifyJwt,
   upload.single("avatar"),
   updateUserAvatar
 );
-userRouter.post(
+userRouter.patch(
   "/update-cover-image",
   verifyJwt,
   upload.single("coverImage"),
   updateUserCoverImage
 );
+userRouter.get("/channel/:username", verifyJwt, getUserChannelProfile);
+userRouter.get("/history", verifyJwt, getWatchHistory);
 
 export default userRouter;
